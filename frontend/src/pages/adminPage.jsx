@@ -7,78 +7,62 @@ function AdminPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
 
-  useEffect(() => {
-    fetchComplaints();
-  }, []);
+  useEffect(() => { fetchComplaints(); }, []);
 
   const fetchComplaints = async () => {
     try {
-      const res = await api.get("/complaint"); 
+      const res = await api.get("/complaint");
       setComplaints(res.data);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
   const handleUpdate = async (id, status, response) => {
     try {
-      await api.put(`/complaint/${id}`, { 
-        status,
-        response,
-      });
+      await api.put(`/complaint/${id}`, { status, response });
       fetchComplaints();
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
   };
 
-  // 🔍 Search + Filter Logic
-  const filteredComplaints = complaints.filter((c) => {
-    const matchSearch = c.complaintId
-      .toLowerCase()
-      .includes(search.toLowerCase());
-
-    const matchFilter =
-      filter === "All" || c.status === filter;
-
+  const filtered = complaints.filter((c) => {
+    const matchSearch = c.complaintId.toLowerCase().includes(search.toLowerCase());
+    const matchFilter = filter === "All" || c.status === filter;
     return matchSearch && matchFilter;
   });
 
+  const filters = ["All", "Pending", "In Progress", "Resolved"];
+
   return (
-    <div>
-      <div className="admin-container">
-        <h1>Admin Dashboard</h1>
+    <div className="admin-wrap">
+      <h1 className="admin-heading">Admin Dashboard</h1>
 
-        {/* 🔍 Search + Filter */}
-        <div className="admin-controls">
-          <input
-            type="text"
-            placeholder="Search by Complaint ID"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-
-          <div className="filter-buttons">
-            <button className={filter === "All" ? "active" : ""} onClick={() => setFilter("All")}>All</button>
-            <button className={filter === "Pending" ? "active" : ""} onClick={() => setFilter("Pending")}>Pending</button>
-            <button className={filter === "In Progress" ? "active" : ""} onClick={() => setFilter("In Progress")}>In Progress</button>
-            <button className={filter === "Resolved" ? "active" : ""} onClick={() => setFilter("Resolved")}>Resolved</button>
-          </div>
+      <div className="admin-toolbar">
+        <input
+          className="admin-search"
+          type="text"
+          placeholder="Search by Complaint ID..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <div className="filter-pills">
+          {filters.map((f) => (
+            <button
+              key={f}
+              className={`filter-pill ${filter === f ? "active" : ""}`}
+              onClick={() => setFilter(f)}
+            >
+              {f}
+            </button>
+          ))}
         </div>
-
-        {/* 📋 Complaints List */}
-        {filteredComplaints.length === 0 ? (
-          <p>No complaints found</p>
-        ) : (
-          filteredComplaints.map((c) => (
-            <ComplaintCard
-              key={c.complaintId}
-              data={c}
-              onUpdate={handleUpdate}
-            />
-          ))
-        )}
       </div>
+
+      {filtered.length === 0 ? (
+        <p style={{ color: "var(--txt-2)", fontSize: "0.9rem" }}>No complaints found.</p>
+      ) : (
+        filtered.map((c) => (
+          <ComplaintCard key={c.complaintId} data={c} onUpdate={handleUpdate} />
+        ))
+      )}
     </div>
   );
 }

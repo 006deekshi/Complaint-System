@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import Navbar from '../components/navbar';
-import api from '../lib/axios';
-
+import React, { useState } from "react";
+import Navbar from "../components/navbar";
+import api from "../lib/axios";
+import { SubmitIllustration } from "../components/illustrations";
 
 function ComplaintPage() {
   const [name, setName] = useState("");
@@ -9,38 +9,17 @@ function ComplaintPage() {
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
 
-  function handleChange(e) {
-    const { name, value } = e.target;
-
-    if (name === "name") {
-      setName(value);
-    } else if (name === "category") {
-      setCategory(value);
-    } else if (name === "description") {
-      setDescription(value);
-    }
-  }
-
   async function handleSubmit(e) {
     e.preventDefault();
-
-    const complaintData = {
-      name: isAnonymous ? "Anonymous" : name,
-      isAnonymous,
-      category,
-      description,
-    };
     try {
-      const res = await api.post("/complaint", complaintData);
-      alert(`Complaint submitted! ID: ${res.data.complaintId}`);
-      setName("");
-      setIsAnonymous(true);
-      setCategory("");
-      setDescription("");
-      
+      const res = await api.post("/complaint", {
+        name: isAnonymous ? "Anonymous" : name,
+        isAnonymous, category, description,
+      });
+      alert(`Complaint submitted!\nYour ID: ${res.data.complaintId}`);
+      setName(""); setIsAnonymous(true); setCategory(""); setDescription("");
     } catch (err) {
-      console.error(err);
-      alert("Failed to submit complaint. Please try again.");
+      alert("Failed to submit. Please try again.");
     }
   }
 
@@ -48,47 +27,51 @@ function ComplaintPage() {
     <div>
       <Navbar />
       <div className="complaint-container">
-        <form onSubmit={handleSubmit} className='complaint-form'>
-          <label htmlFor="name">Name</label>
+        <form onSubmit={handleSubmit} className="form-card">
+          <div className="form-card-icon"><SubmitIllustration /></div>
+          <h2 className="form-card-title">Submit Complaint</h2>
+          <p className="form-card-sub">Your concern will be reviewed promptly</p>
+          <div className="form-divider" />
+
+          <label className="field-label">Your Name</label>
           <input
+            className="field-input"
             type="text"
-            id="name"
-            name="name"
             placeholder="Enter your name..."
             value={name}
-            onChange={handleChange}
-            disabled={isAnonymous} // disable if anonymous
-          /><br />
+            onChange={(e) => setName(e.target.value)}
+            disabled={isAnonymous}
+          />
 
-          <label>
+          <label className="anon-row">
             <input
               type="checkbox"
-              name="isAnonymous"
               checked={isAnonymous}
               onChange={(e) => setIsAnonymous(e.target.checked)}
             />
             Submit anonymously
-          </label><br />
+          </label>
 
-          <label htmlFor="category">Category</label>
+          <label className="field-label">Category</label>
           <input
+            className="field-input"
             type="text"
-            id="category"
-            name="category"
-            placeholder="Ex: Hostel, Food, Academics..."
+            placeholder="e.g. Hostel, Food, Academics..."
             value={category}
-            onChange={handleChange}
-          /><br />
+            onChange={(e) => setCategory(e.target.value)}
+          />
 
-          <label htmlFor="description">Description</label>
+          <label className="field-label">Description</label>
           <textarea
-            id="description"
-            name="description"
+            className="field-input"
+            placeholder="Describe your complaint in detail..."
             value={description}
-            onChange={handleChange}
-          /><br />
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
-          <button type="submit">Submit Complaint</button>
+          <button type="submit" className="btn-gold" style={{ marginTop: "0.25rem" }}>
+            Submit Complaint
+          </button>
         </form>
       </div>
     </div>

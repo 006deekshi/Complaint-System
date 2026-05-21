@@ -4,29 +4,41 @@ function ComplaintCard({ data, onUpdate }) {
   const [status, setStatus] = useState(data.status || "Pending");
   const [response, setResponse] = useState(data.response || "");
 
+  const statusClass =
+    data.status === "Pending" ? "pending" :
+    data.status === "In Progress" ? "progress" : "resolved";
+
   return (
-    <div className="admin-card">
-      <p><b>ID:</b> {data.complaintId}</p>
-      <p><b>Category:</b> {data.category}</p>
-      <p><b>Description:</b> {data.description}</p>
+    <div className="c-card">
+      <div className="c-card-row">
+        <span className="c-label">ID</span>
+        <span className="c-value"><strong>{data.complaintId}</strong></span>
+        <span className={`status ${statusClass}`} style={{ marginLeft: "auto" }}>{data.status}</span>
+      </div>
 
-      <p><b>Status:</b> {data.status}</p>
+      <div className="c-divider" />
 
-      <select value={status} onChange={(e) => setStatus(e.target.value)}>
-        <option>Pending</option>
-        <option>In Progress</option>
-        <option>Resolved</option>
-      </select>
+      <p className="c-value"><strong>Category:</strong> {data.category}</p>
+      <p className="c-value"><strong>Description:</strong> {data.description}</p>
 
-      <textarea
-        placeholder="Write response..."
-        value={response}
-        onChange={(e) => setResponse(e.target.value)}
-      />
+      <div className="c-divider" />
 
-      <button onClick={() => onUpdate(data.complaintId, status, response)}>
-        Update
-      </button>
+      <div className="c-actions">
+        <select className="c-select" value={status} onChange={(e) => setStatus(e.target.value)}>
+          <option>Pending</option>
+          <option>In Progress</option>
+          <option>Resolved</option>
+        </select>
+        <textarea
+          className="c-textarea"
+          placeholder="Write a response to the complainant..."
+          value={response}
+          onChange={(e) => setResponse(e.target.value)}
+        />
+        <button className="c-update-btn" onClick={() => onUpdate(data.complaintId, status, response)}>
+          Update
+        </button>
+      </div>
     </div>
   );
 }
